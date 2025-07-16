@@ -1,0 +1,50 @@
+version: "3.9"
+services:
+  api:
+    build: ./Tasker.API
+    ports:
+      - "5000:8080" # Host 5000 -> Container 8080 (correct mapping)
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=taskerdb;Username=taskeruser;Password=secret123
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - taskernet
+
+  frontend:
+    build:
+      context: ./Tasker.Frontend
+      args:
+        - VITE_API_URL=http://localhost:5000
+    ports:
+      - "5173:3000" # Host 5173 -> Container 3000 (correct mapping)
+    restart: unless-stopped
+    networks:
+      - taskernet
+
+  db:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: taskerdb
+      POSTGRES_USER: taskeruser
+      POSTGRES_PASSWORD: secret123
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskeruser -d taskerdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - taskernet
+
+volumes:
+  postgres-data:
+
+networks:
+  taskernet:

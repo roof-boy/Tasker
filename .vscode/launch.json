@@ -1,0 +1,46 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch API",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-api",
+      "program": "${workspaceFolder}/Tasker.API/bin/Debug/net8.0/Tasker.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Tasker.API",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ConnectionStrings__DefaultConnection": "Host=localhost;Port=5432;Database=taskerdb;Username=taskeruser;Password=secret123"
+      }
+    },
+    {
+      "name": "Launch Frontend",
+      "type": "node",
+      "request": "launch",
+      "preLaunchTask": "start-frontend",
+      "program": "${workspaceFolder}/Tasker.Frontend/node_modules/.bin/vite",
+      "args": ["--host", "0.0.0.0", "--port", "5173"],
+      "cwd": "${workspaceFolder}/Tasker.Frontend",
+      "env": {
+        "VITE_API_URL": "http://localhost:7090"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Launch Full Stack (Live Refresh)",
+      "configurations": [
+        "Launch API",
+        "Launch Frontend"
+      ],
+      "preLaunchTask": "start-database",
+      "stopAll": true
+    }
+  ]
+}

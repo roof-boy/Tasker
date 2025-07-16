@@ -122,12 +122,8 @@ using (var scope = app.Services.CreateScope())
     await SeedingScripts.SeedAdminUserAsync(userManager, roleManager, configuration);
 }
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCors("DefaultPolicy");
 

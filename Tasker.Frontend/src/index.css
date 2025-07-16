@@ -1,0 +1,3 @@
+@layer base, utilities, components, theme, antd;
+
+@import 'tailwindcss';

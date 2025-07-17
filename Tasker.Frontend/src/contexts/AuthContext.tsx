@@ -32,14 +32,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const loadStoredUser = () => {
       try {
         const storedUserData = localStorage.getItem("userData");
-
         if (storedUserData) {
           const userData = JSON.parse(storedUserData);
           setUser(userData);
         }
       } catch (error) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("userData");
+        clearAuthStorage();
         console.log(error);
       } finally {
         setIsLoading(false);
@@ -59,10 +57,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     console.log("Logout function called");
-    // Clear auth data from localStorage
-    localStorage.removeItem("token");
-    localStorage.removeItem("userData");
-    // Update state
+    clearAuthStorage();
     setUser(null);
   };
 
@@ -78,6 +73,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
+
+// External user logout
+export function clearAuthStorage() {
+  localStorage.removeItem("userData");
+}
 
 // Custom hook for using the auth context
 export const useAuth = (): AuthContextType => {

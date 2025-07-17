@@ -1,5 +1,7 @@
 import axios, { AxiosError, type CreateAxiosDefaults } from "axios";
 import type { ApiResponse } from "../types/ApiResponse";
+import { clearAuthStorage } from "../contexts/AuthContext";
+import { Navigate } from "react-router";
 
 const axiosConfig = {
   baseURL: import.meta.env.VITE_API_URL,
@@ -7,6 +9,15 @@ const axiosConfig = {
 
 // Create Axios Instance
 export const axiosInstance = axios.create(axiosConfig);
+
+axiosInstance.interceptors.response.use(undefined, function (res) {
+  if (res.status === 401) {
+    clearAuthStorage();
+    Navigate({ to: "/auth/login" });
+  }
+
+  return res;
+});
 
 /**
  * Custom GET method to return objects as ApiResponse types directly

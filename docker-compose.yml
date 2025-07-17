@@ -6,6 +6,7 @@ services:
       - "5000:8080" # Host 5000 -> Container 8080 (correct mapping)
     environment:
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=taskerdb;Username=taskeruser;Password=secret123
+      - FrontendURL=https://localhost:5173
     depends_on:
       db:
         condition: service_healthy
@@ -17,7 +18,7 @@ services:
     build:
       context: ./Tasker.Frontend
       args:
-        - VITE_API_URL=http://localhost:5000
+        - VITE_API_URL=https://localhost:5000
     ports:
       - "5173:3000" # Host 5173 -> Container 3000 (correct mapping)
     restart: unless-stopped

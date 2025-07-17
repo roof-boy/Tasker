@@ -70,7 +70,7 @@ builder.Services.AddAutoMapper(cfg => cfg.AddProfile<AutoMapperProfile>());
 builder.Services.AddCors(opt =>
     opt.AddPolicy("DefaultPolicy", pol =>
         pol
-            .WithOrigins("http://localhost:8080")
+            .WithOrigins(Environment.GetEnvironmentVariable("FrontendURL") ?? throw new Exception("FrontendURL var must be set for CORS!"))
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials()

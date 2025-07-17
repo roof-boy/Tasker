@@ -36,8 +36,8 @@ namespace Tasker.API.Controllers
             Response.Cookies.Append("access_token", token, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = false,
-                SameSite = SameSiteMode.Lax,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
                 Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_configuration["TokenSettings:TokenExpirationMinutes"]))
             });
 

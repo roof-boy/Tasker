@@ -54,7 +54,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         const res = await apiGet<UserLoginResponse>("Auth/account", true);
 
-        if (!res.success) {
+        if (
+          !res.success &&
+          !window.location.pathname.startsWith("/auth")
+        ) {
           logout();
           window.location.replace("/auth/login");
         } else {

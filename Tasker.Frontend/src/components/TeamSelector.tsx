@@ -1,58 +1,49 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { useEffect, useMemo } from "react";
+import { useTeamContext } from "../contexts/TeamContext";
 import { Avatar, Button, Dropdown, Space, Spin, type MenuProps } from "antd";
 import { DownOutlined } from "@ant-design/icons";
-import { GetTeamsForUser } from "../api/teamActions";
 import type { Team } from "../types/Team";
 
 export default function TeamSelector() {
-  const { user, isLoading } = useAuth();
-  const [team, setTeam] = useState<string | null>(null);
-  const [dropdownItems, setDropdownItems] = useState<MenuProps["items"]>([]);
-  const [teamsLoading, setTeamsLoading] = useState<boolean>(false);
+  const { teams, selectedTeam, selectTeam, teamsLoading, refreshTeams } =
+    useTeamContext();
+
+  // Map teams to dropdown items
+  const dropdownItems = useMemo<MenuProps["items"]>(() => {
+    if (!teams) return [];
+    return teams.map((team: Team) => ({
+      key: team.id,
+      label: team.name,
+      icon: (
+        <Avatar style={{ backgroundColor: getColorForTeam(team.name) }}>
+          {getInitials(team.name)}
+        </Avatar>
+      ),
+    }));
+  }, [teams]);
 
   useEffect(() => {
-    const fetchTeamsAndMap = async () => {
-      if (user && !isLoading) {
-        setTeamsLoading(true);
-        const response = await GetTeamsForUser();
-        if (response.success) {
-          const items: MenuProps["items"] = response.data.map((team: Team) => ({
-            key: team.name,
-            label: team.name,
-            icon: (
-              <Avatar style={{ backgroundColor: getColorForTeam(team.name) }}>
-                {getInitials(team.name)}
-              </Avatar>
-            ),
-          }));
-
-          setDropdownItems(items);
-          setTeamsLoading(false);
-        }
-      }
-    };
-
-    fetchTeamsAndMap();
-  }, [user, isLoading]);
+    refreshTeams(); // in case not loaded (safe if already loaded)
+  }, []);
 
   return (
     <Dropdown
       menu={{
         items: dropdownItems,
-        selectedKeys: team ? [team] : [],
+        selectedKeys: selectedTeam ? [selectedTeam.id] : [],
         onClick: (e) => {
-          setTeam(e.key);
+          const team = teams?.find((t) => t.id === e.key);
+          if (team) selectTeam(team);
         },
-        disabled: dropdownItems!.length <= 0,
+        disabled: !teams || teams.length === 0,
       }}
-      disabled={dropdownItems!.length <= 0}
+      disabled={!teams || teams.length === 0}
     >
       <Button style={{ width: "14rem" }}>
         {teamsLoading && <Spin size="small" />}
-        {teamsLoading === false && (
+        {!teamsLoading && (
           <Space>
-            {team ?? "Select a Team"}
+            {selectedTeam?.name ?? "Select a Team"}
             <DownOutlined />
           </Space>
         )}
@@ -70,7 +61,7 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-// Utility to generate a color from the team name (can customize)
+// Utility to generate a color from the team name
 function getColorForTeam(name: string) {
   const hash = [...name].reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const colors = ["#f56a00", "#7265e6", "#ffbf00", "#00a2ae", "#52c41a"];

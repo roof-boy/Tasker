@@ -4,13 +4,16 @@ import { RouterProvider } from "react-router/dom";
 import "./index.css";
 import { StrictMode } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
+import { TeamProvider } from "./contexts/TeamContext";
 
 const root = document.getElementById("root");
 
 ReactDOM.createRoot(root!).render(
   <StrictMode>
     <AuthProvider>
-      <RouterProvider router={router} />
+      <TeamProvider>
+        <RouterProvider router={router} />
+      </TeamProvider>
     </AuthProvider>
   </StrictMode>
 );

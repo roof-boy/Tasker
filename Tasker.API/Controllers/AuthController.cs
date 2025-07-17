@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Tasker.API.Controllers.Base;
 using Tasker.API.Services;
 using Tasker.API.Models.Transfer.User;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Tasker.API.Controllers
 {
@@ -53,6 +54,20 @@ namespace Tasker.API.Controllers
                 return BadRequest();
 
             return Ok();
+        }
+
+        [Authorize]
+        [HttpGet("account")]
+        public ActionResult<LoginResponseModel> GetAccount()
+        {
+            var user = GetLoggedInUser();
+
+            if (user is null)
+                return Unauthorized();
+
+            var infoModel = _mapper.Map<LoginResponseModel>(user);
+
+            return Ok(infoModel);
         }
     }
 }

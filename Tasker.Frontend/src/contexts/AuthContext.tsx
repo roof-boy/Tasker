@@ -6,6 +6,7 @@ import {
   useEffect,
 } from "react";
 import { type UserLoginResponse } from "../types/User";
+import { apiGet } from "../api/axios";
 
 // Define the shape of our auth context
 interface AuthContextType {
@@ -45,6 +46,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     loadStoredUser();
+  }, []);
+
+  // Check if token is valid on startup
+  useEffect(() => {
+    const validateToken = async () => {
+      try {
+        const res = await apiGet<UserLoginResponse>("Auth/account", true);
+
+        if (!res.success) {
+          logout();
+          window.location.replace("/auth/login");
+        } else {
+          setUser(res.data);
+        }
+      } catch (err) {
+        logout(); // fallback in case of unexpected error
+        window.location.replace("/auth/login");
+      }
+    };
+
+    validateToken();
   }, []);
 
   const login = (userData: UserLoginResponse) => {

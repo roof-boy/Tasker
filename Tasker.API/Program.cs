@@ -39,6 +39,19 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero
     };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var token = context.Request.Cookies["access_token"];
+            if (!string.IsNullOrEmpty(token))
+            {
+                context.Token = token;
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
 
 // Add Authorization
@@ -57,9 +70,10 @@ builder.Services.AddAutoMapper(cfg => cfg.AddProfile<AutoMapperProfile>());
 builder.Services.AddCors(opt =>
     opt.AddPolicy("DefaultPolicy", pol =>
         pol
-            .AllowAnyOrigin()
+            .WithOrigins("http://localhost:8080")
             .AllowAnyHeader()
             .AllowAnyMethod()
+            .AllowCredentials()
     ));
 ;
 

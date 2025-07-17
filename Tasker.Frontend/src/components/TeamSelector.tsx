@@ -15,7 +15,7 @@ export default function TeamSelector() {
     const fetchTeamsAndMap = async () => {
       if (user && !isLoading) {
         setTeamsLoading(true);
-        const response = await GetTeamsForUser(user.tokens.accessToken);
+        const response = await GetTeamsForUser();
         if (response.success) {
           const items: MenuProps["items"] = response.data.map((team: Team) => ({
             key: team.name,

@@ -6,7 +6,8 @@ export default async function LoginUser(data: any) {
   const response: ApiResponse<UserLoginResponse> = await apiPost(
     "Auth/Login",
     JSON.stringify(data),
-    { headers: { "Content-Type": "application/json" } }
+    { headers: { "Content-Type": "application/json" } },
+    true
   );
 
   return response;

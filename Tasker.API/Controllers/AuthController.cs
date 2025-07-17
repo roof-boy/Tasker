@@ -31,10 +31,15 @@ namespace Tasker.API.Controllers
 
             response.Roles = await _userService.GetRolesForUserAsync(user) ?? new List<string>();
 
-            response.Tokens = new LoginTokenResponseModel
+            var token = await _tokenService.GenerateAccessToken(user);
+
+            Response.Cookies.Append("access_token", token, new CookieOptions
             {
-                AccessToken = await _tokenService.GenerateAccessToken(user)
-            };
+                HttpOnly = true,
+                Secure = false,
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_configuration["TokenSettings:TokenExpirationMinutes"]))
+            });
 
             return Ok(response);
         }

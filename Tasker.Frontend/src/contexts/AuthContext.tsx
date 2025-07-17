@@ -31,10 +31,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const loadStoredUser = () => {
       try {
-        const storedToken = localStorage.getItem("token");
         const storedUserData = localStorage.getItem("userData");
 
-        if (storedToken && storedUserData) {
+        if (storedUserData) {
           const userData = JSON.parse(storedUserData);
           setUser(userData);
         }
@@ -53,7 +52,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = (userData: UserLoginResponse) => {
     console.log("Login function called with:", userData);
     // Store auth data in localStorage
-    localStorage.setItem("token", userData.tokens.accessToken);
     localStorage.setItem("userData", JSON.stringify(userData));
     // Update state
     setUser(userData);

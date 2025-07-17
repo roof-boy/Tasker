@@ -10,13 +10,22 @@ export const axiosInstance = axios.create(axiosConfig);
 
 /**
  * Custom GET method to return objects as ApiResponse types directly
- * @param url 
- * @param config 
- * @returns 
+ * @param url
+ * @param config
+ * @param credentials
+ * @returns
  */
-export async function apiGet<T>(url: string, config?: any): Promise<ApiResponse<T>> {
+export async function apiGet<T>(
+  url: string,
+  credentials: boolean = false,
+  config: any = {}
+): Promise<ApiResponse<T>> {
   try {
-    const response = await axiosInstance.get<T>(url, config);
+    const response = await axiosInstance.get<T>(url, {
+      ...config,
+      withCredentials: credentials,
+    });
+
     return {
       success: true,
       data: response.data,
@@ -34,36 +43,40 @@ export async function apiGet<T>(url: string, config?: any): Promise<ApiResponse<
 
 /**
  * Custom POST method to post objects and return results as ApiResponse types directly
- * @param url 
- * @param body 
- * @param config 
+ * @param url
+ * @param body
+ * @param config
  * @returns ApiResponse
  */
 export async function apiPost<T, B = any>(
   url: string,
   body: B,
-  config?: any
+  config?: any,
+  credentials: boolean = false
 ): Promise<ApiResponse<T>> {
   try {
-    const response = await axiosInstance.post<T>(url, body, config);
+    const response = await axiosInstance.post<T>(url, body, {
+      ...config,
+      withCredentials: credentials,
+    });
     return {
       success: true,
       data: response.data,
     };
   } catch (err) {
-  const error = err as AxiosError;
+    const error = err as AxiosError;
 
-  const responseData = error.response?.data;
+    const responseData = error.response?.data;
 
-  const message =
-    typeof responseData === "string"
-      ? responseData // directly use the plain string
-      : error.message;
+    const message =
+      typeof responseData === "string"
+        ? responseData // directly use the plain string
+        : error.message;
 
-  return {
-    success: false,
-    error: message,
-    data: responseData,
-  };
-}
+    return {
+      success: false,
+      error: message,
+      data: responseData,
+    };
+  }
 }
